@@ -47,6 +47,7 @@ public class LoginController {
     @PostMapping("/register")
     public UserDTO registerUser(@RequestBody UserDTO userDTO) {
         User newUser = registerService.registerNewUser(userDTO);
+        System.out.println("user id " + newUser.getId());
         return new UserDTO(newUser.getUsername(), newUser.getPassword());
     }
 
