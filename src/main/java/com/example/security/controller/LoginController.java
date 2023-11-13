@@ -1,13 +1,13 @@
 package com.example.security.controller;
 
 
-import com.example.security.config.TokenProvider;
+import com.example.security.config.JwtUtil;
 import com.example.security.model.User;
 import com.example.security.model.UserDTO;
 import com.example.security.model.JWTResponse;
 import com.example.security.service.RegisterService;
 import com.example.security.service.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -21,26 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = "*")
+@AllArgsConstructor
 public class LoginController {
-
-    @Autowired
-     AuthenticationManager authenticationManager;
-
-    @Autowired
+    AuthenticationManager authenticationManager;
     UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     RegisterService registerService;
-
-    @Autowired
-    TokenProvider tokenProvider;
-
+    JwtUtil tokenProvider;
 
     @PostMapping("/login")
     public JWTResponse authenticateUser(@RequestBody UserDTO userDTO) throws Exception {
         Authentication auth = authenticate(userDTO.getUsername(), userDTO.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(userDTO.getUsername());
-        String jwt = tokenProvider.doGenerateToken(userDetails.getUsername());
+        String jwt = tokenProvider.generateToken(userDetails.getUsername());
         return new JWTResponse(jwt, new UserDTO(userDetails.getUsername(), userDetails.getPassword()));
     }
 
@@ -50,7 +42,6 @@ public class LoginController {
         System.out.println("user id " + newUser.getId());
         return new UserDTO(newUser.getUsername(), newUser.getPassword());
     }
-
 
     private Authentication authenticate(String username, String password) throws Exception {
         Authentication authentication;

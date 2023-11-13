@@ -8,25 +8,20 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 
 @Service
-public class TokenProvider {
-
-  private static final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
-
+public class JwtUtil {
+  private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
   private final SecretKey secretKey = Jwts.SIG.HS256.key().build();
-
   public String getUserNameFromToken(String token) {
-
-
     JwtParser parser = Jwts.parser()
         .verifyWith(secretKey)
         .build();
+
     Claims claims = parser.parseSignedClaims(token).getPayload();
     System.out.println(claims.getSubject());
     return claims.getSubject();
   }
 
-
-  public String doGenerateToken(String username) {
+  public String generateToken(String username) {
     String token = Jwts.builder()
 //       .encryptWith(secretKey, Jwts.ENC.A128CBC_HS256)
         .signWith(secretKey)
@@ -44,8 +39,6 @@ public class TokenProvider {
 
   public boolean validateToken(String authToken) {
     try {
-      System.out.println("token: " + authToken);
-
       JwtParser parser = Jwts.parser()
          // .decryptWith(secretKey)
           .verifyWith(secretKey)

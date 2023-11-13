@@ -6,7 +6,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,11 +16,8 @@ import java.io.IOException;
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
-    @Value("${jwt.secret}")
-    private String secret;
-
     @Autowired
-    private TokenProvider tokenProvider;
+    private JwtUtil jwtUtil;
 
     @Autowired
     UserDetailsServiceImpl userDetailsService;
@@ -33,8 +29,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             if (requestHeader != null && requestHeader.startsWith("Bearer ")) {
                 String token = requestHeader.substring(7);
 
-                if (tokenProvider.validateToken(token)) {
-                    String username = tokenProvider.getUserNameFromToken(token);
+                if (jwtUtil.validateToken(token)) {
+                    String username = jwtUtil.getUserNameFromToken(token);
 
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
